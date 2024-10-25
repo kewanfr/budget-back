@@ -162,7 +162,9 @@ paths:
           schema:
             type: array
             items:
-              type: string
+              type: integer
+              format: int64
+            default: ['Courses']
       responses:
         '200':
           description: successful operation
