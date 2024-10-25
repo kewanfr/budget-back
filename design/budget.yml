@@ -45,7 +45,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Expense'
-        
     put:
       tags:
         - Dépense
