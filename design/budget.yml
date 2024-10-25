@@ -1,0 +1,477 @@
+openapi: 3.0.3
+info:
+  title: Budget API - OpenAPI 3.0
+  description: |-
+    This is a sample Budget application API.
+  contact:
+    email: mail@kewan.fr
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/v1
+    description: Local server
+  - url: https://api.budget.kewan.fr/v1
+    description: Production server
+tags:
+  - name: Dépense
+    description: Opérations sur les dépenses
+  - name: Catégories
+    description: Opérations sur les différentes catégories
+  - name: Résumé
+    description: Résumé des dépenses
+  - name: Utilisateur
+    description: Operations sur les utilisateurs
+paths:
+  /expense:
+    get:
+      tags:
+        - Dépense
+      summary: Récupérer toutes les dépenses
+      description: Retourne toutes les dépenses
+      operationId: getExpenses
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Expense'          
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Expense'
+        
+    put:
+      tags:
+        - Dépense
+      summary: Modifier une dépense existante
+      description: Modifie une dépense existante selon l'ID
+      operationId: updateExpense
+      requestBody:
+        description: Objet dépense à modifier
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Expense'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Expense'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Expense'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Expense'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Expense not found
+        '422':
+          description: Validation exception
+          
+    post:
+      tags:
+        - Dépense
+      summary: Ajouter une nouvelle dépense
+      description: Crée une nouvelle dépense
+      operationId: addExpense
+      requestBody:
+        description: Objet dépense à ajouter
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseCreate'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/ExpenseCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExpenseCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Expense'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+  /expense/findByMonth:
+    get:
+      tags:
+        - Dépense
+      summary: Trouver les dépenses par mois
+      description: Retourne les dépenses pour un mois donné, plusieurs mois peuvent être fournis avec des chaînes séparées par des virgules. Utilisez 2021-01, 2021-02, 2021-03 pour les tests.
+      operationId: findExpensesByMonth
+      parameters:
+        - name: yearAndMonth
+          in: query
+          description: Mois à filtrer
+          required: false
+          explode: true
+          schema:
+            type: string
+            default: 2024-10
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Expense'          
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Expense'
+        '400':
+          description: Invalid status value
+  /expense/findByCategorie:
+    get:
+      tags:
+        - Dépense
+      summary: Trouver les dépenses par catégorie
+      description: Plusieurs catégories peuvent être fournis avec des chaînes séparées par des virgules. Utilisez cat1, cat2, cat3 pour les tests.
+      operationId: findExpensesByCategorie
+      parameters:
+        - name: categorie
+          in: query
+          description: Catégorie à filtrer
+          required: false
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Expense'          
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Expense'
+        '400':
+          description: Invalid tag value
+  /expense/{expenseId}:
+    get:
+      tags:
+        - Dépense
+      summary: Trouver une dépense par ID
+      description: Retourne une seule dépense
+      operationId: getExpenseById
+      parameters:
+        - name: ExpenseId
+          in: path
+          description: ID of Expense to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Expense'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Expense not found
+    delete:
+      tags:
+        - Dépense
+      summary: Supprimer une dépense
+      description: Supprime une dépense selon l'ID
+      operationId: deleteExpense
+      parameters:
+        - name: expenseId
+          in: path
+          description: ID de la dépense à supprimer
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '400':
+          description: Invalid ID supplied
+  /categorie:
+    post:
+      tags:
+        - Catégories
+      summary: Ajouter une nouvelle catégorie
+      description: Crée une nouvelle catégorie
+      operationId: addCategorie
+      requestBody:
+        description: Objet catégorie à ajouter
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Categorie'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Categorie'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Categorie'
+        required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categorie'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Categorie'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+  /categorie/{categorieId}:
+    delete:
+      tags:
+        - Catégories
+      summary: Supprimer une catégorie
+      description: Supprime une catégorie selon l'ID
+      operationId: deleteCategorie
+      parameters:
+        - name: categorieId
+          in: path
+          description: ID de la catégorie à supprimer
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '400':
+          description: Invalid ID supplied
+  /categorie/{categorieId}/uploadIcon:
+    post:
+      tags:
+        - Catégories
+      summary: Ajouter une icône à une catégorie
+      description: ''
+      operationId: uploadFile
+      parameters:
+        - name: categorieId
+          in: path
+          description: ID de la catégorie à laquelle ajouter une icône
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: additionalMetadata
+          in: query
+          description: Additional Metadata
+          required: false
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+    put:
+      tags:
+        - Dépense
+      summary: Modifier une dépense existante
+      description: Modifie une dépense existante selon l'ID
+      operationId: updateExpense
+      requestBody:
+        description: Objet dépense à modifier
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Expense'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Expense'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Expense'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Expense'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Expense not found
+        '422':
+          description: Validation exception
+  /summary/sumByMonth:
+    get:
+      tags:
+        - Résumé
+      summary: Somme des dépenses par mois trié par catégorie
+      description: Retourne les dépenses pour un mois donné, avec la somme des dépenses par catégorie
+      operationId: sumExpensesByMonth
+      parameters:
+        - name: yearAndMonth
+          in: query
+          description: Mois à filtrer
+          required: false
+          explode: true
+          schema:
+            type: string
+            default: 2024-10
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Summary'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Summary'
+        '400':
+          description: Invalid status value
+components:
+  schemas:
+    Summary:
+      type: object
+      properties:
+        categorie:
+          $ref: '#/components/schemas/Categorie'
+        sum:
+          type: number
+          format: float
+          example: 10.5
+    Categorie:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        name:
+          type: string
+          example: Courses
+        icon:
+          type: string
+          example: 'icon-caddie'
+      xml:
+        name: categorie
+    ExpenseCreate:
+      required:
+        - category_id
+        - amount
+        - date
+      type: object
+      properties:
+        category_id:
+          type: integer
+          format: int64
+          example: 1
+        magasin:
+          type: string
+          example: U Express
+        date:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+        amount:
+          type: number
+          format: float
+          example: 10.5
+        description:
+          type: string
+          example: 'Achat de la semaine'
+    Expense:
+      required:
+        - date
+        - amount
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        categorie:
+          $ref: '#/components/schemas/Categorie'
+        magasin:
+          type: string
+          example: U Express
+        date:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+        amount:
+          type: number
+          format: float
+          example: 10.5
+        description:
+          type: string
+          example: 'Achat de la semaine'
+      xml:
+        name: expense
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
+      xml:
+        name: '##default'
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
