@@ -1,0 +1,26 @@
+{
+  "name": "budget-back",
+  "version": "0.1.0",
+  "description": "Backend for budget tracking app",
+  "main": "server.js",
+  "scripts": {
+    "test": "npx mocha"
+  },
+  "author": "kewanb",
+  "license": "MIT",
+  "dependencies": {
+    "@fastify/autoload": "^6.0.2",
+    "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.35.3",
+    "fastify": "^5.0.0",
+    "fastify-plugin": "^5.0.1",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.11.10",
+    "chai": "^5.1.2",
+    "drizzle-kit": "^0.26.2",
+    "mocha": "^10.7.3",
+    "supertest": "^7.0.0"
+  }
+}
