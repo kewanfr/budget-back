@@ -2,6 +2,7 @@
 const { categories } = require('../schema');
 const db = require('../db');
 const { eq } = require('drizzle-orm');
+const { getCategorieById } = require('../functions/categorie');
 
 async function categorieRoutes(fastify, options) {
   // Récupère toutes les catégories
@@ -41,7 +42,7 @@ async function categorieRoutes(fastify, options) {
   fastify.get('/v1/categorie/:id', async (request, reply) => {
     const { id } = request.params;
     try {
-      const categorie = await db.select().from(categories).where(eq(categories.id, id));
+      const categorie = await getCategorieById(id);
       if (categorie.length === 0) {
         return reply.status(404).send({ message: 'Categorie not found' });
       }
@@ -56,8 +57,7 @@ async function categorieRoutes(fastify, options) {
   // Supprime une catégorie selon l'Id
   fastify.delete('/v1/categorie/:id', async (request, reply) => {
     const { id } = request.params;
-
-    const categorie = await db.select().from(categories).where(eq(categories.id, id));
+    const categorie = await getCategorieById(id);
     
     if (categorie.length === 0) {
       return reply.status(404).send({ message: 'Categorie not found' });
