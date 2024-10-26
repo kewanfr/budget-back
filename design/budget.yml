@@ -291,6 +291,36 @@ paths:
         '500':
           description: Server Error
   /categorie/{categorieId}:
+    get:
+      tags:
+        - Catégories
+      summary: Récupère une catégorie
+      description: Récupère une catégorie depuis son ID
+      operationId: getCategorie
+      parameters:
+        - name: categorieId
+          in: path
+          description: ID de la catégorie à récupérer
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categorie'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Categorie'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+        '500':
+          description: Server Error
     delete:
       tags:
         - Catégories
