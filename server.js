@@ -4,7 +4,15 @@ require('dotenv').config();
 const path = require('path');
 const autoload = require('@fastify/autoload');
 const fastifyPlugin = require('fastify-plugin');
-const expenseRoutes = require('./routes/expense');
+const fastifyCors = require('@fastify/cors');
+
+
+
+// Configurer CORS
+fastify.register(fastifyCors, {
+  origin: '*', // Vous pouvez restreindre cela à des domaines spécifiques
+  methods: ['GET', 'POST', 'PUT', 'DELETE']
+});
 
 fastify.register(autoload, {
   dir: path.join(__dirname, 'routes'),
