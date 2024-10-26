@@ -1,7 +1,9 @@
 // routes/events.js
 const { expensesTable, categoriesTable } = require('../schema');
 const db = require('../db');
-const { eq, inArray } = require('drizzle-orm');
+const { eq, gte, and, lt } = require('drizzle-orm');
+const { getCategoriesById } = require('../functions/categorie');
+const { getExpensesByCatId } = require('../functions/expense');
 
 async function expenseRoutes(fastify, options) {
   // Récupère toutes les dépenses avec les catégories associées
@@ -63,9 +65,60 @@ async function expenseRoutes(fastify, options) {
     }
   });
 
+  // Modifie une dépense existante
+  fastify.put('/v1/expense', async (request, reply) => {
+
+    const { id, category_id, magasin, date, amount, description } = request.body;
+
+    if (!id) {
+      return reply.status(400).send({ message: 'Missing required fields' });
+    }
+
+    // les autres champs sont optionnels et seront mis à jour s'ils sont fournis
+    const updateFields = {};
+    if (category_id) {
+      updateFields.category_id = category_id
+    }
+    if (magasin) {
+      updateFields.magasin = magasin
+    }
+    if (date) {
+      updateFields.date = new Date(date)
+    }
+    if (amount) {
+      updateFields.amount = amount
+    }
+    if (description) {
+      updateFields.description = description
+    }
+
+    try {
+      const expense = await db.select().from(expensesTable).where(eq(expensesTable.id, id));
+
+      if (expense.length === 0) {
+        return reply.status(404).send({ message: 'Expense not found' });
+      }
+
+      const updatedExpense = await db.update(expensesTable).set(updateFields).where(eq(expensesTable.id, id)).returning();
+      
+      reply.send(updatedExpense[0]);
+    } catch (error) {
+      fastify.log.error(error);
+      reply.status(500).send({ message: 'Error updating expense' });
+    }
+  });
+
   // Récupère une dépense spécifique
   fastify.get('/v1/expense/:id', async (request, reply) => {
     const { id } = request.params;
+
+    if (!id) {
+      return reply.status(400).send({ message: 'Missing required fields' });
+    }
+
+    if (isNaN(id)) {
+      return reply.status(400).send({ message: 'Invalid id' });
+    }
     
     try {
       const expense = await db.select().from(expensesTable).where(eq(expensesTable.id, id));
@@ -108,6 +161,7 @@ async function expenseRoutes(fastify, options) {
 
   // Récupère toutes les dépenses par catégorie
   fastify.get('/v1/expense/findByCategorie', async (request, reply) => {
+    console.log(request.query);
     let { categorie } = request.query;
 
     // verify all int value of categorie
@@ -118,17 +172,58 @@ async function expenseRoutes(fastify, options) {
     if (!Array.isArray(categorie)) {
       categorie = [categorie];
     }
+
+    if (isNaN(categorie[0])) {
+      return reply.status(400).send({ message: 'Invalid categorie id' });
+    }
+    
     try {
-      const expensesFound = await db.select().from(expensesTable).where(inArray(expensesTable.category_id, categorie));
+
+      const expensesFound = await getExpensesByCatId(categorie[0]);
       
-      reply.send(expensesFound);
       if(expensesFound.length == 0){
         return reply.status(404).send({ message: "Expenses not found" })
       }
 
+      return reply.send(expensesFound);
+
+
     } catch (error) {
       fastify.log.error(error);
       reply.status(500).send({ message: 'Error finding expenses' });
+    }
+  });
+
+  // Récupère toutes les dépenses par mois
+  fastify.get('/v1/expense/findByMonth', async (request, reply) => {
+
+    const { yearAndMonth } = request.query;
+
+    console.log(yearAndMonth);
+    if (!yearAndMonth) {
+      return reply.status(400).send({ message: 'Missing required fields' });
+    }
+    
+    let [year, month] = yearAndMonth.split("-");
+
+    if (isNaN(year) || isNaN(month) || month < 1 || month > 12) {
+      reply.status(400).send({ message: "Invalid date format" });
+      return false;
+    }
+
+    year = parseInt(year);
+    month = parseInt(month);
+
+    const dateStartMonth = new Date(year, month - 1, 1);
+    const nextMonth = new Date(year, month, 1);
+
+    try {
+      const monthExpenses = await db.select().from(expensesTable).where(and(gte(expensesTable.date, dateStartMonth), lt(expensesTable.date, nextMonth)));
+
+      reply.send(monthExpenses);
+    } catch (error) {
+      fastify.log.error(error);
+      reply.status(500).send({ message: 'Error fetching summary' });
     }
   });
 
