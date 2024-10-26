@@ -181,7 +181,7 @@ paths:
                   $ref: '#/components/schemas/Expense'
         '400':
           description: Invalid tag value
-  /expense/byId/{expenseId}:
+  /expense/{expenseId}:
     get:
       tags:
         - Dépense
