@@ -480,8 +480,10 @@ components:
           type: integer
           format: int64
           example: 10
-        categorie:
-          $ref: '#/components/schemas/Categorie'
+        category_id:
+          type: integer
+          format: int64
+          example: 1
         magasin:
           type: string
           example: U Express
