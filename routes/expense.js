@@ -42,7 +42,7 @@ async function expenseRoutes(fastify, options) {
 
 
     try {
-      const category = await db.select().from(categories).where(eq(categories.id, category_id));
+      const category = await getCategorieById(category_id);
 
       if (category.length === 0) {
         return reply.status(404).send({ message: 'Category not found' });
