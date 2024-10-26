@@ -29,17 +29,20 @@ async function getSumByYearAndMonth(yearAndMonth, request, reply) {
     );
 
   const categoriesSums = {};
+  const categoriesCount = {};
 
   for (expense of monthExpenses) {
     catId = parseInt(expense.category_id)
     if (!(catId in categoriesSums)) {
-        categoriesSums[catId] = 0
+      categoriesSums[catId] = 0
+    }
+
+    if (!(catId in categoriesCount)) {
+      categoriesCount[catId] = 0
     }
     categoriesSums[catId] += parseFloat(expense.amount)
+    categoriesCount[catId] += 1
 
-    console.log(expense)
-    console.log(parseFloat(expense.amount))
-    console.log(categoriesSums[catId])
   }
 
   var response = [];
@@ -52,6 +55,7 @@ async function getSumByYearAndMonth(yearAndMonth, request, reply) {
     response.push({
       categorie: categorie[0],
       sum: categoriesSums[catId],
+      count: categoriesCount[catId]
     });
   }
 
