@@ -13,8 +13,7 @@ async function expenseRoutes(fastify, options) {
           ...categories
         }
       }).from(expenses).innerJoin(categories, eq(categories.id, expenses.category_id))
-      // const allExpenses = await (await db.select().from(expenses)).join(categories, eq(expenses.category_id, categories.id));
-      console.log(allExpenses);
+
       reply.send(allExpenses);
     } catch (error) {
       fastify.log.error(error);
