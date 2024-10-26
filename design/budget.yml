@@ -151,12 +151,12 @@ paths:
       tags:
         - Dépense
       summary: Trouver les dépenses par catégorie
-      description: Plusieurs catégories peuvent être fournis avec des chaînes séparées par des virgules. Utilisez cat1, cat2, cat3 pour les tests.
+      description: Plusieurs catégories peuvent être fournis avec des chaînes séparées par des virgules.
       operationId: findExpensesByCategorie
       parameters:
         - name: categorie
           in: query
-          description: Catégorie à filtrer
+          description: Id de la catégorie à filtrer
           required: false
           explode: true
           schema:
@@ -181,7 +181,7 @@ paths:
                   $ref: '#/components/schemas/Expense'
         '400':
           description: Invalid tag value
-  /expense/{expenseId}:
+  /expense/byId/{expenseId}:
     get:
       tags:
         - Dépense
