@@ -1,5 +1,5 @@
 // routes/events.js
-const { expenses, categories } = require('../schema');
+const { expensesTable, categoriesTable } = require('../schema');
 const db = require('../db');
 const { eq, inArray } = require('drizzle-orm');
 
@@ -8,11 +8,11 @@ async function expenseRoutes(fastify, options) {
   fastify.get('/v1/expense', async (request, reply) => {
     try {
       const allExpenses = await db.select({
-        ...expenses,
+        ...expensesTable,
         categorie: {
-          ...categories
+          ...categoriesTable
         }
-      }).from(expenses).innerJoin(categories, eq(categories.id, expenses.category_id))
+      }).from(expensesTable).innerJoin(categoriesTable, eq(categoriesTable.id, expensesTable.category_id))
 
       reply.send(allExpenses);
     } catch (error) {
@@ -42,13 +42,13 @@ async function expenseRoutes(fastify, options) {
 
 
     try {
-      const category = await getCategorieById(category_id);
+      const category = await getCategoriesById(category_id);
 
       if (category.length === 0) {
         return reply.status(404).send({ message: 'Category not found' });
       }
 
-      const newExpense = await db.insert(expenses).values({
+      const newExpense = await db.insert(expensesTable).values({
         category_id: category_id,
         magasin: magasin,
         date: date,
@@ -68,7 +68,7 @@ async function expenseRoutes(fastify, options) {
     const { id } = request.params;
     
     try {
-      const expense = await db.select().from(expenses).where(eq(expenses.id, id));
+      const expense = await db.select().from(expensesTable).where(eq(expensesTable.id, id));
 
       if (expense.length === 0) {
         return reply.status(404).send({ message: 'Expense not found' });
@@ -85,14 +85,14 @@ async function expenseRoutes(fastify, options) {
   fastify.delete('/v1/expense/:id', async (request, reply) => {
     const { id } = request.params;
 
-    const expense = await db.select().from(expenses).where(eq(expenses.id, id));
+    const expense = await db.select().from(expensesTable).where(eq(expensesTable.id, id));
     
     if (expense.length === 0) {
       return reply.status(404).send({ message: 'Expense not found' });
     }
 
     try {
-      const expenseDelete = await db.delete(expenses).where(eq(expenses.id, id));
+      const expenseDelete = await db.delete(expensesTable).where(eq(expensesTable.id, id));
       
       if (expenseDelete === 0) {
         return reply.status(404).send({ message: 'Expense not found' });
@@ -119,7 +119,7 @@ async function expenseRoutes(fastify, options) {
       categorie = [categorie];
     }
     try {
-      const expensesFound = await db.select().from(expenses).where(inArray(expenses.category_id, categorie));
+      const expensesFound = await db.select().from(expensesTable).where(inArray(expensesTable.category_id, categorie));
       
       reply.send(expensesFound);
       if(expensesFound.length == 0){

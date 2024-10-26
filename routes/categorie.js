@@ -1,14 +1,14 @@
 // routes/events.js
-const { categories } = require('../schema');
+const { categoriesTable } = require('../schema');
 const db = require('../db');
 const { eq } = require('drizzle-orm');
-const { getCategorieById } = require('../functions/categorie');
+const { getCategoriesById } = require('../functions/categorie');
 
 async function categorieRoutes(fastify, options) {
   // Récupère toutes les catégories
   fastify.get('/v1/categorie', async (request, reply) => {
     try {
-      const allCategories = await db.select().from(categories);
+      const allCategories = await db.select().from(categoriesTable);
 
       reply.send(allCategories);
     } catch (error) {
@@ -27,7 +27,7 @@ async function categorieRoutes(fastify, options) {
 
     try {
 
-      const newCategory = await db.insert(categories).values({
+      const newCategory = await db.insert(categoriesTable).values({
         name: name
       }).returning();
 
@@ -42,7 +42,7 @@ async function categorieRoutes(fastify, options) {
   fastify.get('/v1/categorie/:id', async (request, reply) => {
     const { id } = request.params;
     try {
-      const categorie = await getCategorieById(id);
+      const categorie = await getCategoriesById(id);
       if (categorie.length === 0) {
         return reply.status(404).send({ message: 'Categorie not found' });
       }
@@ -57,14 +57,14 @@ async function categorieRoutes(fastify, options) {
   // Supprime une catégorie selon l'Id
   fastify.delete('/v1/categorie/:id', async (request, reply) => {
     const { id } = request.params;
-    const categorie = await getCategorieById(id);
+    const categorie = await getCategoriesById(id);
     
     if (categorie.length === 0) {
       return reply.status(404).send({ message: 'Categorie not found' });
     }
 
     try {
-      const categorieDelete = await db.delete(categories).where(eq(categories.id, id));
+      const categorieDelete = await db.delete(categoriesTable).where(eq(categoriesTable.id, id));
       
       if (categorieDelete === 0) {
         return reply.status(404).send({ message: 'Categorie not found' });
