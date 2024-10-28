@@ -338,75 +338,6 @@ paths:
       responses:
         '400':
           description: Invalid ID supplied
-  /categorie/{categorieId}/uploadIcon:
-    post:
-      tags:
-        - Catégories
-      summary: Ajouter une icône à une catégorie
-      description: ''
-      operationId: uploadFile
-      parameters:
-        - name: categorieId
-          in: path
-          description: ID de la catégorie à laquelle ajouter une icône
-          required: true
-          schema:
-            type: integer
-            format: int64
-        - name: additionalMetadata
-          in: query
-          description: Additional Metadata
-          required: false
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/octet-stream:
-            schema:
-              type: string
-              format: binary
-      responses:
-        '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-    put:
-      tags:
-        - Dépense
-      summary: Modifier une dépense existante
-      description: Modifie une dépense existante selon l'ID
-      operationId: updateExpense
-      requestBody:
-        description: Objet dépense à modifier
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Expense'
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/Expense'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/Expense'
-        required: true
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Expense'          
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/Expense'
-        '400':
-          description: Invalid ID supplied
-        '404':
-          description: Expense not found
-        '422':
-          description: Validation exception
   /summary/sumByMonth:
     get:
       tags:
@@ -458,6 +389,10 @@ components:
         name:
           type: string
           example: Courses
+        budget:
+          type: number
+          format: float
+          example: 100
     Categorie:
       type: object
       properties:
@@ -471,6 +406,10 @@ components:
         icon:
           type: string
           example: 'icon-caddie'
+        budget:
+          type: number
+          format: float
+          example: 100
       xml:
         name: categorie
     ExpenseUpdate:
