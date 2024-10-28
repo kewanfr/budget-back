@@ -19,16 +19,30 @@ async function categorieRoutes(fastify, options) {
 
   // Crée une nouvelle catégorie
   fastify.post('/v1/categorie', async (request, reply) => {
-    let { name } = request.body;
+
+    let { name, budget, icon } = request.body;
+
+    console.log(request.body);
+    console.log(name, budget, icon);
 
     if (!name) {
       return reply.status(400).send({ message: 'Missing required fields' });
     }
 
+    if (!budget) {
+      budget = 0;
+    }
+
+    if (!icon) {
+      icon = null;
+    }
+
     try {
 
       const newCategory = await db.insert(categoriesTable).values({
-        name: name
+        name: name,
+        budget: budget,
+        icon: icon
       }).returning();
 
       reply.status(201).send(newCategory);
