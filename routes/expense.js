@@ -36,8 +36,6 @@ async function expenseRoutes(fastify, options) {
       return reply.status(400).send({ message: 'Invalid date' });
     }
 
-    amount = parseFloat(amount);
-
     if (!category_id || !date || !amount) {
       return reply.status(400).send({ message: 'Missing required fields' });
     }

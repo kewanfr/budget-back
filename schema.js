@@ -12,7 +12,8 @@ const categoriesTable = pgTable("categories", {
   id: serial("id").primaryKey(),
   name: varchar("name", 255).notNull(),
   icon: varchar("icon", 255),
-  description: text("description"),
+  budget: serial("budget"),
+  // description: text("description"),
 });
 
 const expensesTable = pgTable("expenses", {
