@@ -54,7 +54,7 @@ async function getSumByYearAndMonth(yearAndMonth, request, reply) {
 
     response.push({
       categorie: categorie[0],
-      sum: categoriesSums[catId],
+      sum: parseFloat(categoriesSums[catId].toFixed(2)),
       count: categoriesCount[catId]
     });
   }
